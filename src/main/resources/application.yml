@@ -1,0 +1,22 @@
+# Main application.yml - base configuration
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: nutech
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}  # Default dev
+
+  # File Upload
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+# JWT Configuration
+app:
+  jwt:
+    secret: ${JWT_SECRET:ZGVmYXVsdC1kZXYtc2VjcmV0LWNoYW5nZS1mb3ItcmFpbHdheQ==}
+    expiration: ${JWT_EXPIRATION:20000}

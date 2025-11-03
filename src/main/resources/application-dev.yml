@@ -1,0 +1,34 @@
+# LOCAL DEVELOPMENT PROFILE
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/nutechdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Jakarta
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  sql:
+    init:
+      mode: always
+
+app:
+  jwt:
+    expiration: 20000
+
+logging:
+  level:
+    com.nutech: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
