@@ -1,82 +1,123 @@
 package com.nutech.service;
 
-import com.nutech.dto.ProfileRequest;
+import com.nutech.dto.ProfileUpdateRequest;
 import com.nutech.dto.ProfileResponse;
+import com.nutech.exception.BusinessException;
 import com.nutech.model.User;
 import com.nutech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
+
     private final UserRepository userRepository;
+    private final String UPLOAD_DIR = "uploads/profile-images/";
 
-    @Transactional(readOnly = true)
-    public ProfileResponse getProfile() {
-        try {
-            String email = getCurrentUserEmail();
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+    @Transactional
+    public ProfileResponse updateProfile(String email, ProfileUpdateRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("User tidak ditemukan", 108));
 
-            return buildProfileResponse(user);
+        // Update profile data
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
 
-        } catch (Exception e) {
-            return buildErrorResponse("Failed to get profile");
-        }
+        User updatedUser = userRepository.save(user);
+
+        return mapToProfileResponse(updatedUser);
     }
 
     @Transactional
-    public ProfileResponse updateProfile(ProfileRequest request) {
+    public ProfileResponse updateProfileImage(String email, MultipartFile file) {
+
+        // Validate file empty
+        if (file.isEmpty()) {
+            throw new BusinessException("File tidak boleh kosong", 102);
+        }
+
+        // Validate file type
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
+            throw new BusinessException("Format Image tidak sesuai", 102);
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("User tidak ditemukan", 108));
+
         try {
-            String email = getCurrentUserEmail();
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            // Create upload directory if not exists
+            Path uploadPath = Paths.get(UPLOAD_DIR);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
 
-            // Update menggunakan repository method
-            userRepository.updateProfile(email, request.getFirstName(), request.getLastName());
+            // Generate unique filename
+            String originalFilename = file.getOriginalFilename();
+            String fileExtension = originalFilename != null ?
+                    originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpeg";
+            String filename = UUID.randomUUID() + fileExtension;
 
-            // Refresh user data
-            user = userRepository.findByEmail(email).orElse(user);
+            // Save file
+            Path filePath = uploadPath.resolve(filename);
+            Files.copy(file.getInputStream(), filePath);
 
-            return buildProfileResponse(user);
+            // Delete old profile image if exists
+            if (user.getProfileImage() != null) {
+                Path oldFilePath = uploadPath.resolve(user.getProfileImage());
+                Files.deleteIfExists(oldFilePath);
+            }
 
-        } catch (Exception e) {
-            return buildErrorResponse("Failed to update profile");
+            // Update user profile image
+            user.setProfileImage(filename);
+            User updatedUser = userRepository.save(user);
+
+            return mapToProfileResponse(updatedUser);
+
+        } catch (IOException e) {
+            throw new BusinessException("Gagal mengupload gambar: " + e.getMessage(), 102);
         }
     }
 
-    private String getCurrentUserEmail() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            return ((UserDetails) authentication.getPrincipal()).getUsername();
+    public ProfileResponse getProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException("User tidak ditemukan", 108));
+
+        return mapToProfileResponse(user);
+    }
+
+    private ProfileResponse mapToProfileResponse(User user) {
+        String profileImageUrl = null;
+        if (user.getProfileImage() != null) {
+            profileImageUrl = "/profile/image/" + user.getProfileImage();
         }
-        throw new RuntimeException("User not authenticated");
+
+        return ProfileResponse.builder()
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .profileImage(profileImageUrl)
+                .build();
     }
 
-    private ProfileResponse buildProfileResponse(User user) {
-        ProfileResponse response = new ProfileResponse();
-        response.setStatus(0);
-        response.setMessage("Sukses");
-
-        ProfileResponse.ProfileData data = new ProfileResponse.ProfileData();
-        data.setEmail(user.getEmail());
-        data.setFirstName(user.getFirstName());
-        data.setLastName(user.getLastName());
-        data.setProfileImage(user.getProfileImage());
-
-        response.setData(data);
-        return response;
-    }
-
-    private ProfileResponse buildErrorResponse(String message) {
-        ProfileResponse response = new ProfileResponse();
-        response.setStatus(108);
-        response.setMessage(message);
-        return response;
+    public byte[] getProfileImage(String filename) {
+        try {
+            Path filePath = Paths.get(UPLOAD_DIR).resolve(filename);
+            if (!Files.exists(filePath)) {
+                throw new BusinessException("Gambar tidak ditemukan", 108);
+            }
+            return Files.readAllBytes(filePath);
+        } catch (IOException e) {
+            throw new BusinessException("Gagal membaca gambar: " + e.getMessage(), 108);
+        }
     }
 }

@@ -40,6 +40,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/registration", "/login").permitAll()
+                        .requestMatchers("/profile/image/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

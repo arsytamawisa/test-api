@@ -10,15 +10,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProfileResponse {
-    private String email;
-
+public class ProfileUpdateRequest {
     @JsonProperty("first_name")
     private String firstName;
 
     @JsonProperty("last_name")
     private String lastName;
-
-    @JsonProperty("profile_image")
-    private String profileImage;
 }
