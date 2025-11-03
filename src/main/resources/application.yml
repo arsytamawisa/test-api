@@ -15,8 +15,9 @@ spring:
     multipart:
       max-file-size: 2MB
       max-request-size: 2MB
+
 # JWT Configuration
 app:
   jwt:
     secret: ${JWT_SECRET:ZGVmYXVsdC1kZXYtc2VjcmV0LWNoYW5nZS1mb3ItcmFpbHdheQ==}
-    expiration: ${JWT_EXPIRATION:20000}
+    expiration: ${JWT_EXPIRATION:86400000}

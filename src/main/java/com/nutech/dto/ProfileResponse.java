@@ -11,8 +11,8 @@ public class ProfileResponse {
     @Data
     public static class ProfileData {
         private String email;
-        private String first_name;
-        private String last_name;
-        private String profile_image;
+        private String firstName;
+        private String lastName;
+        private String profileImage;
     }
 }

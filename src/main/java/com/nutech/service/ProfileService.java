@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
-
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
@@ -39,7 +38,7 @@ public class ProfileService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             // Update menggunakan repository method
-            userRepository.updateProfile(email, request.getFirst_name(), request.getLast_name());
+            userRepository.updateProfile(email, request.getFirstName(), request.getLastName());
 
             // Refresh user data
             user = userRepository.findByEmail(email).orElse(user);
@@ -66,9 +65,9 @@ public class ProfileService {
 
         ProfileResponse.ProfileData data = new ProfileResponse.ProfileData();
         data.setEmail(user.getEmail());
-        data.setFirst_name(user.getFirstName());
-        data.setLast_name(user.getLastName());
-        data.setProfile_image(user.getProfileImage());
+        data.setFirstName(user.getFirstName());
+        data.setLastName(user.getLastName());
+        data.setProfileImage(user.getProfileImage());
 
         response.setData(data);
         return response;

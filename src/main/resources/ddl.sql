@@ -37,22 +37,22 @@ CREATE TABLE banners (
 );
 
 
-CREATE TABLE transactions (
-    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
-    invoice_number VARCHAR(100) UNIQUE NOT NULL,
-    transaction_type ENUM('PAYMENT', 'TOPUP') NOT NULL,
-    description VARCHAR(500) NOT NULL,
-    total_amount BIGINT NOT NULL DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id VARCHAR(36) NOT NULL,
-    service_id VARCHAR(36) NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
-    INDEX idx_transaction_user (user_id),
-    INDEX idx_transaction_invoice (invoice_number),
-    INDEX idx_transaction_created (created_at),
-    INDEX idx_transaction_type (transaction_type)
-);
+--CREATE TABLE transactions (
+--    id VARCHAR(36) PRIMARY KEY DEFAULT (UUID()),
+--    invoice_number VARCHAR(100) UNIQUE NOT NULL,
+--    transaction_type ENUM('PAYMENT', 'TOPUP') NOT NULL,
+--    description VARCHAR(500) NOT NULL,
+--    total_amount BIGINT NOT NULL DEFAULT 0,
+--    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--    user_id VARCHAR(36) NOT NULL,
+--    service_id VARCHAR(36) NULL,
+--    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
+--    INDEX idx_transaction_user (user_id),
+--    INDEX idx_transaction_invoice (invoice_number),
+--    INDEX idx_transaction_created (created_at),
+--    INDEX idx_transaction_type (transaction_type)
+--);
 
 
 INSERT INTO users (id, email, password, first_name, last_name, balance) VALUES
@@ -84,7 +84,7 @@ INSERT INTO banners (id, banner_name, banner_image, description) VALUES
 ('bnr-006', 'Banner 6', 'https://nutech-integrasi.app/banner6.jpg', 'Description for banner 6');
 
 
-INSERT INTO transactions (id, invoice_number, transaction_type, description, total_amount, user_id, service_id) VALUES
-('trx-001', 'INV-001', 'TOPUP', 'Top Up balance', 100000, 'usr-001', NULL),
-('trx-002', 'INV-002', 'PAYMENT', 'Pembayaran Pajak PBB', 40000, 'usr-001', 'srv-001'),
-('trx-003', 'INV-003', 'PAYMENT', 'Pembayaran Listrik', 10000, 'usr-002', 'srv-002');
+--INSERT INTO transactions (id, invoice_number, transaction_type, description, total_amount, user_id, service_id) VALUES
+--('trx-001', 'INV-001', 'TOPUP', 'Top Up balance', 100000, 'usr-001', NULL),
+--('trx-002', 'INV-002', 'PAYMENT', 'Pembayaran Pajak PBB', 40000, 'usr-001', 'srv-001'),
+--('trx-003', 'INV-003', 'PAYMENT', 'Pembayaran Listrik', 10000, 'usr-002', 'srv-002');

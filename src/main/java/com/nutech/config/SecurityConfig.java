@@ -2,6 +2,7 @@ package com.nutech.config;
 
 import com.nutech.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +27,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Autowired
     private final UserService userService;
+
+    @Autowired
     private final TokenAuthentication tokenAuthFilter;
 
     @Bean
