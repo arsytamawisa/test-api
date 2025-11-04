@@ -33,15 +33,9 @@ public class TokenAuthentication extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        final String requestPath = request.getServletPath();
-
-        if (isPublicEndpoint(requestPath)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            sendErrorResponse(response, "Token tidak valid atau tidak ditemukan");
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -57,23 +51,14 @@ public class TokenAuthentication extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
-                } else {
-                    sendErrorResponse(response, "Token tidak valid");
-                    return;
                 }
             }
         } catch (Exception e) {
-            sendErrorResponse(response, "Token error: " + e.getMessage());
+            sendErrorResponse(response, e.getMessage());
             return;
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isPublicEndpoint(String path) {
-        return path.equals("/registration") ||
-                path.equals("/login") ||
-                path.startsWith("/profile/image/");
     }
 
     private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
@@ -86,5 +71,13 @@ public class TokenAuthentication extends OncePerRequestFilter {
         );
 
         response.getWriter().write(errorJson);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return path.equals("/registration") ||
+                path.equals("/login") ||
+                path.startsWith("/profile/image/");
     }
 }
