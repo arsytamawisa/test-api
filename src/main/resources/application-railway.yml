@@ -8,7 +8,7 @@ spring:
     url: ${DATABASE_URL}?sslmode=require
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 5
+      initialization-fail-timeout: 60000
       connection-timeout: 30000
 
   jpa:
@@ -21,7 +21,6 @@ spring:
         format_sql: false
         jdbc:
           time_zone: UTC
-        connection.provider_disables_autocommit: true
     generate-ddl: true
 
   sql:
