@@ -8,9 +8,8 @@ spring:
     url: ${DATABASE_URL}
     driver-class-name: org.postgresql.Driver
     hikari:
-      initialization-fail-timeout: 60000
       connection-timeout: 30000
-      maximum-pool-size: 5
+      maximum-pool-size: 3
 
   jpa:
     hibernate:
@@ -19,15 +18,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: false
         jdbc:
           time_zone: UTC
-    generate-ddl: true
 
-  sql:
-    init:
-      mode: always
-      platform: postgresql
-
-  lifecycle:
-    timeout-per-shutdown-phase: 30s
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION:86400000}
