@@ -8,7 +8,7 @@ spring:
   application:
     name: nutech
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}  # Default dev
+    active: ${SPRING_PROFILES_ACTIVE:railway}  # Default dev
 
   # File Upload
   servlet:
