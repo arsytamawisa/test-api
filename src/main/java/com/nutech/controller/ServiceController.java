@@ -1,21 +1,21 @@
 package com.nutech.controller;
 
-import com.nutech.dto.ServiceResponse;
+import com.nutech.dto.ServiceItemResponse;
 import com.nutech.service.LayananPPOBService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
-@RequestMapping("/services")
+@RequestMapping("/service")
 @RequiredArgsConstructor
 public class ServiceController {
 
-    private final LayananPPOBService servicePPOB;
+    private final LayananPPOBService layananPPOBService;
 
     @GetMapping
-    public ResponseEntity<ServiceResponse> getServices() {
-        ServiceResponse response = servicePPOB.getServices();
-        return ResponseEntity.ok(response);
+    public List<ServiceItemResponse> getAllServices() {
+        return layananPPOBService.getServices();
     }
 }

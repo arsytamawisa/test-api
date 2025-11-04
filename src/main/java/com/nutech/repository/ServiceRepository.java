@@ -8,7 +8,13 @@ import java.util.Optional;
 
 @Repository
 public interface ServiceRepository extends JpaRepository<ServiceModel, String> {
+
     List<ServiceModel> findAllByOrderByCreatedAtDesc();
+
+    List<ServiceModel> findAllByOrderByServiceNameAsc();
+
     Optional<ServiceModel> findByServiceCode(String serviceCode);
+
     boolean existsByServiceCode(String serviceCode);
+
 }

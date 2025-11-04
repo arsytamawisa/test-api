@@ -1,7 +1,5 @@
 package com.nutech.exception;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.nutech.dto.GenericResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -9,15 +7,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class BalanceExceptionHandler {
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<GenericResponse<Object>> handleBusinessException(BusinessException ex) {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GenericResponse<Object>> handleBalanceJsonParseException(HttpMessageNotReadableException ex) {
         GenericResponse<Object> response = GenericResponse.builder()
-                .status(ex.getErrorCode())
-                .message(ex.getMessage())
+                .status(102)
+                .message("Parameter amount hanya boleh angka dan tidak boleh lebih kecil dari 0")
                 .data(null)
                 .build();
+
         return ResponseEntity.badRequest().body(response);
     }
 }
