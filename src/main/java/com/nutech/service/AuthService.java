@@ -2,12 +2,15 @@ package com.nutech.service;
 
 import com.nutech.dto.LoginRequest;
 import com.nutech.dto.LoginResponse;
+import com.nutech.dto.RegistrationRequest;
+import com.nutech.dto.RegistrationResponse;
 import com.nutech.exception.BusinessException;
 import com.nutech.model.User;
 import com.nutech.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,19 +21,15 @@ public class AuthService {
     private final TokenService tokenService;
 
     public LoginResponse login(LoginRequest request) {
-        // Find user by email
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException("Email atau password salah", 103));
 
-        // Validate password
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException("Email atau password salah", 103);
         }
 
-        // Generate JWT token
         String token = tokenService.generateToken(user.getEmail());
 
-        // Build response according to API documentation
         return LoginResponse.builder()
                 .status(0)
                 .message("Login berhasil")
@@ -38,5 +37,27 @@ public class AuthService {
                         .token(token)
                         .build())
                 .build();
+    }
+
+    @Transactional
+    public RegistrationResponse register(RegistrationRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email sudah terdaftar", 102);
+        }
+
+        User user = User.builder()
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .balance(0L)
+                .build();
+
+        userRepository.save(user);
+
+        return RegistrationResponse.builder()
+                .status(0)
+                .message("Registrasi berhasil silakan login")
+                .data(null).build();
     }
 }

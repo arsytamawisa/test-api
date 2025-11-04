@@ -19,12 +19,10 @@ public class RegistrationService {
 
     @Transactional
     public RegistrationResponse register(RegistrationRequest request) {
-        // Validate email already exists
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException("Email sudah terdaftar", 102);
         }
 
-        // Create new user
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
