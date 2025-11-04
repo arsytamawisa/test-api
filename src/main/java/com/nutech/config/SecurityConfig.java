@@ -30,13 +30,6 @@ public class SecurityConfig {
     private final TokenAuthentication tokenAuthFilter;
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring()
-                .requestMatchers(HttpMethod.POST, "/**/registration", "/**/login")
-                .requestMatchers("/profile/image/**");
-    }
-
-    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
