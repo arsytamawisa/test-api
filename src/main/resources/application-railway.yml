@@ -5,59 +5,29 @@ spring:
       on-profile: railway
 
   datasource:
-    url: ${DATABASE_URL}?sslmode=require&sslfactory=org.postgresql.ssl.DefaultSSLFactory
+    url: ${DATABASE_URL}?sslmode=require
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 5
       connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: false
-        connection.provider_disables_autocommit: true
         jdbc:
           time_zone: UTC
+        connection.provider_disables_autocommit: true
+    generate-ddl: true
 
   sql:
     init:
-      mode: never
+      mode: always
+      platform: postgresql
 
-  # Handle connection issues
   lifecycle:
     timeout-per-shutdown-phase: 30s
-
-server:
-  port: ${PORT:8080}
-  servlet:
-    context-path: /
-  shutdown: graceful
-
-# Configuration for production
-management:
-  health:
-    db:
-      enabled: true
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-
-app:
-  jwt:
-    expiration: 86400000
-
-logging:
-  level:
-    com.nutech: INFO
-    org.springframework.security: WARN
-    org.hibernate.SQL: OFF
-    org.springframework.orm.jpa: WARN
-  pattern:
-    level: WARN
