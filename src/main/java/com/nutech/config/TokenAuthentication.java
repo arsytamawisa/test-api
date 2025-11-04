@@ -59,10 +59,4 @@ public class TokenAuthentication extends OncePerRequestFilter {
             response.getWriter().write("{\"status\":108,\"message\":\"Token tidak valid\",\"data\":null}");
         }
     }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        return path.equals("/registration") || path.equals("/login") || path.startsWith("/profile/image/");
-    }
 }
